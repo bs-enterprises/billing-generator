@@ -7,7 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -127,4 +127,31 @@
   html {
     @apply font-sans;
   }
+}
+
+/* ── Color Palette Themes ── */
+[data-palette="blue"] {
+  --primary: oklch(0.46 0.22 262);
+  --primary-foreground: oklch(0.98 0 0);
+  --ring: oklch(0.62 0.18 262);
+  --accent: oklch(0.93 0.05 262);
+  --accent-foreground: oklch(0.46 0.22 262);
+}
+[data-palette="blue"].dark {
+  --primary: oklch(0.72 0.18 262);
+  --primary-foreground: oklch(0.08 0 0);
+  --ring: oklch(0.55 0.2 262);
+}
+
+[data-palette="green"] {
+  --primary: oklch(0.47 0.14 141);
+  --primary-foreground: oklch(0.98 0 0);
+  --ring: oklch(0.62 0.12 141);
+  --accent: oklch(0.93 0.04 141);
+  --accent-foreground: oklch(0.47 0.14 141);
+}
+[data-palette="green"].dark {
+  --primary: oklch(0.72 0.12 141);
+  --primary-foreground: oklch(0.08 0 0);
+  --ring: oklch(0.55 0.14 141);
 }
