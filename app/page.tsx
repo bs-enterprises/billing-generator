@@ -139,12 +139,17 @@ const THEMES = [
 const PROFILE_KEYS: (keyof InvoiceData)[] = [
   "sellerName", "sellerAddress", "sellerCity", "sellerState", "sellerPincode",
   "sellerGSTIN", "sellerPhone", "sellerEmail", "sellerPAN",
+  "buyerName", "buyerAddress", "buyerCity", "buyerState", "buyerPincode",
+  "buyerGSTIN", "buyerPhone", "buyerEmail",
+  "invoiceNumber", "invoiceDate", "dueDate", "placeOfSupply",
+  "items",
   "bankName", "accountHolderName", "accountNumber", "ifscCode", "branchName",
   "paymentModes", "upiId", "upiName", "chequePayableTo",
+  "paymentStatus", "paymentReference", "amountPaid",
   "notes", "termsAndConditions",
 ];
 
-const STORAGE_KEY = "invoice_profile_v3";
+const STORAGE_KEY = "invoice_profile_v5";
 
 // ─────────────────────────────────────────────────────────────────
 // Helpers
@@ -390,8 +395,8 @@ function PayStatusBadge({ status }: { status: InvoiceData["paymentStatus"] }) {
 // ─────────────────────────────────────────────────────────────────
 const InvoicePreview = React.forwardRef<
   HTMLDivElement,
-  { data: InvoiceData; calc: Calculations }
->(function InvoicePreview({ data, calc }, ref) {
+  { data: InvoiceData; calc: Calculations; showTerms: boolean }
+>(function InvoicePreview({ data, calc, showTerms }, ref) {
   const hasBankTransfer = data.paymentModes.some((m) => ["neft", "rtgs", "imps"].includes(m));
   const hasUPI   = data.paymentModes.includes("upi") || data.paymentModes.includes("upi_cc");
   const hasCheque = data.paymentModes.includes("cheque");
@@ -420,23 +425,36 @@ const InvoicePreview = React.forwardRef<
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "18px" }}>
 
           {/* Left: company info */}
-          <div style={{ display: "flex", gap: "13px", alignItems: "center" }}>
-            <div>
-              <div style={{ fontWeight: 700, fontSize: "18.5px", color: "#0f172a", lineHeight: 1.2 }}>
-                {data.sellerName || "Your Company Name"}
-              </div>
-              {(data.sellerAddress || data.sellerCity) && (
-                <div style={{ fontSize: "12px", color: "#64748b", marginTop: "3px", lineHeight: 1.55, maxWidth: "300px" }}>
-                  {[data.sellerAddress, data.sellerCity, data.sellerState, data.sellerPincode].filter(Boolean).join(", ")}
-                </div>
-              )}
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginTop: "4px" }}>
-                {data.sellerPhone && <span style={{ fontSize: "12px", color: "#64748b" }}>{data.sellerPhone}</span>}
-                {data.sellerEmail && <span style={{ fontSize: "12px", color: "#64748b" }}>{data.sellerEmail}</span>}
-                {data.sellerGSTIN && <span style={{ fontSize: "12px", color: "#64748b" }}>GSTIN: {data.sellerGSTIN}</span>}
-                {data.sellerPAN   && <span style={{ fontSize: "12px", color: "#64748b" }}>PAN: {data.sellerPAN}</span>}
-              </div>
+          <div style={{ maxWidth: "300px" }}>
+            <div style={{ fontWeight: 700, fontSize: "18.5px", color: "#0f172a", lineHeight: 1.2, marginBottom: "5px" }}>
+              {data.sellerName || "Your Company Name"}
             </div>
+            {(data.sellerAddress || data.sellerCity) && (
+              <div style={{ fontSize: "12px", color: "#64748b", lineHeight: 1.55, marginBottom: "8px" }}>
+                {[data.sellerAddress, data.sellerCity, data.sellerState, data.sellerPincode].filter(Boolean).join(", ")}
+              </div>
+            )}
+            {(data.sellerGSTIN || data.sellerPAN || data.sellerPhone || data.sellerEmail) && (
+              <div style={{ border: "1px solid #e2e8f0", borderRadius: "6px", backgroundColor: "#f8fafc", overflow: "hidden" }}>
+                {([
+                  data.sellerGSTIN ? ["GSTIN", data.sellerGSTIN, true]  : null,
+                  data.sellerPAN   ? ["PAN",   data.sellerPAN,   true]  : null,
+                  data.sellerPhone ? ["Phone", data.sellerPhone, false] : null,
+                  data.sellerEmail ? ["Email", data.sellerEmail, false] : null,
+                ] as ([string, string, boolean] | null)[]).filter((x): x is [string, string, boolean] => x !== null).map(([label, value, bold], i, arr) => (
+                  <div key={label} style={{
+                    display: "flex", justifyContent: "space-between", alignItems: "center",
+                    padding: "5px 10px", borderBottom: i < arr.length - 1 ? "1px solid #f1f5f9" : "none", fontSize: "11.5px",
+                  }}>
+                    <span style={{ color: "#94a3b8", marginRight: "14px", flexShrink: 0 }}>{label}</span>
+                    {bold
+                      ? <strong style={{ color: "#0f172a" }}>{value}</strong>
+                      : <span style={{ color: "#475569" }}>{value}</span>
+                    }
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Right: INVOICE title + meta */}
@@ -453,8 +471,8 @@ const InvoicePreview = React.forwardRef<
                 ["Invoice Date",    fmtDate(data.invoiceDate)],
                 ["Due Date",        fmtDate(data.dueDate)],
                 ["Place of Supply", data.placeOfSupply],
-              ] as [string, string][]).map(([label, value], i, arr) => (
-                <div key={label} style={{ ...ROW, borderBottom: i < arr.length - 1 ? "1px solid #f1f5f9" : "none" }}>
+              ] as [string, string][]).map(([label, value]) => (
+                <div key={label} style={{ ...ROW, borderBottom: "none" }}>
                   <span style={{ color: "#94a3b8" }}>{label}</span>
                   <strong style={{ color: "#0f172a", marginLeft: "20px" }}>{value}</strong>
                 </div>
@@ -527,10 +545,10 @@ const InvoicePreview = React.forwardRef<
           </tbody>
           <tfoot>
             <tr style={{ backgroundColor: "#f1f5f9", borderTop: "1.5px solid #e2e8f0" }}>
-              <td colSpan={7} style={{ padding: "8px 11px", textAlign: "right", fontWeight: 600, color: "#475569", fontSize: "11.5px" }}>
+              <td colSpan={7} style={{ padding: "8px 11px", textAlign: "right", fontWeight: 600, color: "#475569", fontSize: "11.5px", verticalAlign: "middle" }}>
                 Subtotal (before GST)
               </td>
-              <td style={{ padding: "8px 11px", textAlign: "right", fontWeight: 700, fontSize: "13px" }}>
+              <td style={{ padding: "8px 11px", textAlign: "right", fontWeight: 700, fontSize: "13px", verticalAlign: "middle" }}>
                 ₹ {fmt(calc.subtotal)}
               </td>
             </tr>
@@ -624,7 +642,7 @@ const InvoicePreview = React.forwardRef<
 
         {/* ════ BOTTOM SECTION: Payment info + Terms + Signature ════ */}
         <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: "14px", marginBottom: "16px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: data.paymentModes.length > 0 ? "1fr 1fr" : "1fr", gap: "14px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: data.paymentModes.length > 0 && (showTerms || !!data.notes) ? "1fr 1fr" : "1fr", gap: "14px" }}>
 
             {/* Payment info (compact) */}
             {data.paymentModes.length > 0 && (
@@ -653,8 +671,8 @@ const InvoicePreview = React.forwardRef<
                             ["Branch",       data.branchName],
                           ] as [string, string][]).filter(([, v]) => v).map(([k, v]) => (
                             <tr key={k}>
-                              <td style={{ color: "#94a3b8", paddingRight: "10px", paddingBottom: "1px", whiteSpace: "nowrap" }}>{k}</td>
-                              <td style={{ fontWeight: k === "Account No" || k === "Account Name" ? 600 : 400, color: "#1e293b" }}>{v}</td>
+                              <td style={{ color: "#94a3b8", paddingRight: "10px", paddingBottom: "1px", whiteSpace: "nowrap", verticalAlign: "middle" }}>{k}</td>
+                              <td style={{ fontWeight: k === "Account No" || k === "Account Name" ? 600 : 400, color: "#1e293b", verticalAlign: "middle" }}>{v}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -676,21 +694,27 @@ const InvoicePreview = React.forwardRef<
               </div>
             )}
 
-            {/* Terms & Conditions */}
-            <div>
-              <div style={CAP}>Terms &amp; Conditions</div>
-              {data.termsAndConditions ? (
-                <div style={{ fontSize: "11.5px", color: "#64748b", lineHeight: 1.75, whiteSpace: "pre-line" }}>{data.termsAndConditions}</div>
-              ) : (
-                <span style={{ color: "#cbd5e1", fontSize: "12px" }}>—</span>
-              )}
-              {data.notes && (
-                <div style={{ marginTop: "8px" }}>
-                  <div style={CAP}>Notes</div>
-                  <div style={{ fontSize: "11.5px", color: "#64748b", lineHeight: 1.6 }}>{data.notes}</div>
-                </div>
-              )}
-            </div>
+            {/* Terms & Conditions and/or Notes */}
+            {(showTerms || !!data.notes) && (
+              <div>
+                {showTerms && (
+                  <>
+                    <div style={CAP}>Terms &amp; Conditions</div>
+                    {data.termsAndConditions ? (
+                      <div style={{ fontSize: "11.5px", color: "#64748b", lineHeight: 1.75, whiteSpace: "pre-line" }}>{data.termsAndConditions}</div>
+                    ) : (
+                      <span style={{ color: "#cbd5e1", fontSize: "12px" }}>—</span>
+                    )}
+                  </>
+                )}
+                {data.notes && (
+                  <div style={{ marginTop: showTerms ? "8px" : "0" }}>
+                    <div style={CAP}>Notes</div>
+                    <div style={{ fontSize: "11.5px", color: "#64748b", lineHeight: 1.6 }}>{data.notes}</div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -719,6 +743,7 @@ export default function InvoiceGenerator() {
   const [activeView, setActiveView] = useState<"form" | "preview">("form");
   const [isGenerating, setIsGenerating] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [showTerms, setShowTerms] = useState(true);
   const previewRef = useRef<HTMLDivElement>(null);
   const { palette, setPalette, dark, toggleDark, mounted } = useAppTheme();
   const calc = useMemo(() => calcGST(data), [data]);
@@ -731,10 +756,12 @@ export default function InvoiceGenerator() {
         const profile = JSON.parse(raw) as Partial<InvoiceData>;
         setData((d) => ({ ...d, ...profile }));
       }
+      const terms = localStorage.getItem("invoice_show_terms");
+      if (terms !== null) setShowTerms(terms === "1");
     } catch { /* ignore */ }
   }, []);
 
-  // ── Auto-save profile fields (debounced 800 ms) ──
+  // ── Auto-save all state (debounced 800 ms) ──
   useEffect(() => {
     const timer = setTimeout(() => {
       try {
@@ -742,13 +769,14 @@ export default function InvoiceGenerator() {
         const profile: Record<string, any> = {};
         PROFILE_KEYS.forEach((k) => { profile[k] = (data as unknown as Record<string, unknown>)[k]; });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+        localStorage.setItem("invoice_show_terms", showTerms ? "1" : "0");
         setSavedAt(
           new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })
         );
       } catch { /* ignore */ }
     }, 800);
     return () => clearTimeout(timer);
-  }, [data]);
+  }, [data, showTerms]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const set = useCallback((field: keyof InvoiceData, value: any) =>
@@ -1330,10 +1358,24 @@ export default function InvoiceGenerator() {
                   <Textarea rows={2} placeholder="e.g. Thank you for your business!"
                     value={data.notes} onChange={(e) => set("notes", e.target.value)} />
                 </Field>
-                <Field label="Terms & Conditions">
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                      Terms &amp; Conditions
+                    </Label>
+                    <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={showTerms}
+                        onChange={(e) => setShowTerms(e.target.checked)}
+                        className="rounded accent-primary"
+                      />
+                      Show in PDF
+                    </label>
+                  </div>
                   <Textarea rows={5} value={data.termsAndConditions}
                     onChange={(e) => set("termsAndConditions", e.target.value)} />
-                </Field>
+                </div>
               </div>
             </Section>
           </div>
@@ -1352,7 +1394,7 @@ export default function InvoiceGenerator() {
             <div className="border border-border rounded-xl shadow-md bg-white overflow-hidden">
               <div className="overflow-auto" style={{ maxHeight: "calc(100vh - 120px)" }}>
                 <div className="p-6" style={{ minWidth: "640px" }}>
-                  <InvoicePreview ref={previewRef} data={data} calc={calc} />
+                  <InvoicePreview ref={previewRef} data={data} calc={calc} showTerms={showTerms} />
                 </div>
               </div>
             </div>
