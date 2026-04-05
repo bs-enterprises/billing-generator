@@ -397,19 +397,19 @@ const InvoicePreview = React.forwardRef<
   const hasCheque = data.paymentModes.includes("cheque");
 
   const CAP: React.CSSProperties = {
-    fontSize: "8.5px", fontWeight: 700, textTransform: "uppercase",
+    fontSize: "10px", fontWeight: 700, textTransform: "uppercase",
     letterSpacing: "1.4px", color: "#94a3b8", marginBottom: "5px",
   };
   const ROW: React.CSSProperties = {
     display: "flex", justifyContent: "space-between", alignItems: "center",
-    padding: "7px 12px", borderBottom: "1px solid #f1f5f9", fontSize: "11px",
+    padding: "7px 12px", borderBottom: "1px solid #f1f5f9", fontSize: "12.5px",
   };
 
   return (
     <div
       ref={ref}
       id="invoice-preview"
-      style={{ fontFamily: "'Helvetica Neue', Arial, Helvetica, sans-serif", fontSize: "12px", color: "#1a1a1a", backgroundColor: "#ffffff", width: "100%" }}
+      style={{ fontFamily: "'Helvetica Neue', Arial, Helvetica, sans-serif", fontSize: "13px", color: "#1a1a1a", backgroundColor: "#ffffff", width: "100%" }}
     >
       {/* ── Top accent bar ── */}
       <div style={{ height: "4px", backgroundColor: "#1e293b" }} />
@@ -422,26 +422,26 @@ const InvoicePreview = React.forwardRef<
           {/* Left: company info */}
           <div style={{ display: "flex", gap: "13px", alignItems: "center" }}>
             <div>
-              <div style={{ fontWeight: 700, fontSize: "17px", color: "#0f172a", lineHeight: 1.2 }}>
+              <div style={{ fontWeight: 700, fontSize: "18.5px", color: "#0f172a", lineHeight: 1.2 }}>
                 {data.sellerName || "Your Company Name"}
               </div>
               {(data.sellerAddress || data.sellerCity) && (
-                <div style={{ fontSize: "10.5px", color: "#64748b", marginTop: "3px", lineHeight: 1.55, maxWidth: "300px" }}>
+                <div style={{ fontSize: "12px", color: "#64748b", marginTop: "3px", lineHeight: 1.55, maxWidth: "300px" }}>
                   {[data.sellerAddress, data.sellerCity, data.sellerState, data.sellerPincode].filter(Boolean).join(", ")}
                 </div>
               )}
               <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginTop: "4px" }}>
-                {data.sellerPhone && <span style={{ fontSize: "10.5px", color: "#64748b" }}>{data.sellerPhone}</span>}
-                {data.sellerEmail && <span style={{ fontSize: "10.5px", color: "#64748b" }}>{data.sellerEmail}</span>}
-                {data.sellerGSTIN && <span style={{ fontSize: "10.5px", color: "#64748b" }}>GSTIN: {data.sellerGSTIN}</span>}
-                {data.sellerPAN   && <span style={{ fontSize: "10.5px", color: "#64748b" }}>PAN: {data.sellerPAN}</span>}
+                {data.sellerPhone && <span style={{ fontSize: "12px", color: "#64748b" }}>{data.sellerPhone}</span>}
+                {data.sellerEmail && <span style={{ fontSize: "12px", color: "#64748b" }}>{data.sellerEmail}</span>}
+                {data.sellerGSTIN && <span style={{ fontSize: "12px", color: "#64748b" }}>GSTIN: {data.sellerGSTIN}</span>}
+                {data.sellerPAN   && <span style={{ fontSize: "12px", color: "#64748b" }}>PAN: {data.sellerPAN}</span>}
               </div>
             </div>
           </div>
 
           {/* Right: INVOICE title + meta */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "10px" }}>
-            <div style={{ fontSize: "30px", fontWeight: 900, letterSpacing: "6px", color: "#0f172a", lineHeight: 1 }}>
+            <div style={{ fontSize: "32px", fontWeight: 900, letterSpacing: "6px", color: "#0f172a", lineHeight: 1 }}>
               INVOICE
             </div>
             <div style={{
@@ -482,13 +482,13 @@ const InvoicePreview = React.forwardRef<
           ]).map((p) => (
             <div key={p.label} style={{ border: "1px solid #e2e8f0", borderRadius: "6px", padding: "11px 14px", backgroundColor: "#f8fafc" }}>
               <div style={CAP}>{p.label}</div>
-              <div style={{ fontWeight: 700, fontSize: "13px", color: "#0f172a" }}>{p.name || "—"}</div>
+              <div style={{ fontWeight: 700, fontSize: "14.5px", color: "#0f172a" }}>{p.name || "—"}</div>
               {p.address && (
-                <div style={{ fontSize: "10.5px", color: "#64748b", marginTop: "3px", lineHeight: 1.55 }}>
+                <div style={{ fontSize: "12px", color: "#64748b", marginTop: "3px", lineHeight: 1.55 }}>
                   {[p.address, p.city, p.state, p.pincode].filter(Boolean).join(", ")}
                 </div>
               )}
-              <div style={{ marginTop: "5px", fontSize: "10.5px", color: "#475569", lineHeight: 1.7 }}>
+              <div style={{ marginTop: "5px", fontSize: "12px", color: "#475569", lineHeight: 1.7 }}>
                 {p.gstin && <div><span style={{ color: "#94a3b8" }}>GSTIN </span><strong>{p.gstin}</strong></div>}
                 {p.pan   && <div><span style={{ color: "#94a3b8" }}>PAN </span><strong>{p.pan}</strong></div>}
                 {p.phone && <div><span style={{ color: "#94a3b8" }}>Phone </span>{p.phone}</div>}
@@ -499,14 +499,14 @@ const InvoicePreview = React.forwardRef<
         </div>
 
         {/* ════ LINE ITEMS ════ */}
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "11px", marginBottom: "16px" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12.5px", marginBottom: "16px" }}>
           <thead>
             <tr style={{ backgroundColor: "#1e293b", color: "#ffffff" }}>
               {(["#", "Description", "HSN / SAC", "Qty", "Unit", "Rate (₹)", "GST %", "Amount (₹)"] as const).map((h, i) => (
                 <th key={h} style={{
                   padding: "9px 11px",
                   textAlign: (i === 0 ? "center" : i >= 3 ? "right" : "left") as "left" | "right" | "center",
-                  fontWeight: 600, fontSize: "10px", letterSpacing: "0.1px", whiteSpace: "nowrap",
+                  fontWeight: 600, fontSize: "11.5px", letterSpacing: "0.1px", whiteSpace: "nowrap",
                 }}>{h}</th>
               ))}
             </tr>
@@ -527,10 +527,10 @@ const InvoicePreview = React.forwardRef<
           </tbody>
           <tfoot>
             <tr style={{ backgroundColor: "#f1f5f9", borderTop: "1.5px solid #e2e8f0" }}>
-              <td colSpan={7} style={{ padding: "8px 11px", textAlign: "right", fontWeight: 600, color: "#475569", fontSize: "10px" }}>
+              <td colSpan={7} style={{ padding: "8px 11px", textAlign: "right", fontWeight: 600, color: "#475569", fontSize: "11.5px" }}>
                 Subtotal (before GST)
               </td>
-              <td style={{ padding: "8px 11px", textAlign: "right", fontWeight: 700, fontSize: "12px" }}>
+              <td style={{ padding: "8px 11px", textAlign: "right", fontWeight: 700, fontSize: "13px" }}>
                 ₹ {fmt(calc.subtotal)}
               </td>
             </tr>
@@ -542,7 +542,7 @@ const InvoicePreview = React.forwardRef<
           {/* GST table */}
           <div>
             <div style={CAP}>GST Breakdown</div>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "10.5px", border: "1px solid #e2e8f0", borderRadius: "6px", overflow: "hidden" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px", border: "1px solid #e2e8f0", borderRadius: "6px", overflow: "hidden" }}>
               <thead>
                 <tr style={{ backgroundColor: "#f1f5f9" }}>
                   {(["Rate", "Taxable (₹)", ...(calc.isIntraState ? ["CGST (₹)", "SGST (₹)"] : ["IGST (₹)"]), "Total (₹)"] as string[]).map((h, i) => (
@@ -578,17 +578,17 @@ const InvoicePreview = React.forwardRef<
                 ? [{ label: "CGST", value: fmt(calc.cgstTotal) }, { label: "SGST", value: fmt(calc.sgstTotal) }]
                 : [{ label: "IGST", value: fmt(calc.igstTotal) }]),
             ].map(({ label, value }) => (
-              <div key={label} style={{ ...ROW, fontSize: "11px" }}>
+              <div key={label} style={{ ...ROW, fontSize: "12.5px" }}>
                 <span style={{ color: "#64748b" }}>{label}</span>
                 <span style={{ color: "#0f172a" }}>₹ {value}</span>
               </div>
             ))}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "11px 12px", backgroundColor: "#1e293b", color: "#ffffff" }}>
-              <span style={{ fontWeight: 700, fontSize: "12px", letterSpacing: "0.4px" }}>TOTAL DUE</span>
-              <span style={{ fontWeight: 900, fontSize: "15px" }}>₹ {fmt(calc.grandTotal)}</span>
+              <span style={{ fontWeight: 700, fontSize: "13px", letterSpacing: "0.4px" }}>TOTAL DUE</span>
+              <span style={{ fontWeight: 900, fontSize: "16.5px" }}>₹ {fmt(calc.grandTotal)}</span>
             </div>
             {data.paymentStatus !== "unpaid" && (
-              <div style={{ display: "flex", justifyContent: "space-between", padding: "7px 12px", backgroundColor: "#f0fdf4", borderTop: "1px solid #dcfce7", fontSize: "11px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", padding: "7px 12px", backgroundColor: "#f0fdf4", borderTop: "1px solid #dcfce7", fontSize: "12.5px" }}>
                 <span style={{ color: "#166534" }}>Amount Received</span>
                 <span style={{ color: "#166534", fontWeight: 600 }}>₹ {fmt(data.amountPaid)}</span>
               </div>
@@ -597,7 +597,7 @@ const InvoicePreview = React.forwardRef<
         </div>
 
         {/* ── Amount in words ── */}
-        <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "5px", padding: "8px 12px", marginBottom: "16px", fontSize: "10.5px", color: "#475569" }}>
+        <div style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "5px", padding: "8px 12px", marginBottom: "16px", fontSize: "12px", color: "#475569" }}>
           <strong style={{ color: "#0f172a" }}>Amount in Words: </strong>
           <span style={{ fontStyle: "italic" }}>{numToWords(calc.grandTotal)}</span>
         </div>
@@ -607,7 +607,7 @@ const InvoicePreview = React.forwardRef<
           <div style={{
             backgroundColor: data.paymentStatus === "paid" ? "#f0fdf4" : "#fffbeb",
             border: `1px solid ${data.paymentStatus === "paid" ? "#bbf7d0" : "#fde68a"}`,
-            borderRadius: "5px", padding: "8px 12px", marginBottom: "14px", fontSize: "11px",
+            borderRadius: "5px", padding: "8px 12px", marginBottom: "14px", fontSize: "12.5px",
             display: "flex", justifyContent: "space-between", alignItems: "center",
           }}>
             <span>
@@ -617,7 +617,7 @@ const InvoicePreview = React.forwardRef<
               </span>
             </span>
             {data.paymentReference && (
-              <span style={{ color: "#475569", fontSize: "10.5px" }}><strong>Ref/UTR: </strong>{data.paymentReference}</span>
+              <span style={{ color: "#475569", fontSize: "12px" }}><strong>Ref/UTR: </strong>{data.paymentReference}</span>
             )}
           </div>
         )}
@@ -630,12 +630,12 @@ const InvoicePreview = React.forwardRef<
             {data.paymentModes.length > 0 && (
               <div>
                 <div style={CAP}>Payment Information</div>
-                <div style={{ border: "1px solid #e2e8f0", borderRadius: "6px", overflow: "hidden", fontSize: "10.5px" }}>
+                <div style={{ border: "1px solid #e2e8f0", borderRadius: "6px", overflow: "hidden", fontSize: "12px" }}>
                   {hasUPI && data.upiId && (
                     <div style={{ padding: "7px 11px", borderBottom: "1px solid #f1f5f9", backgroundColor: "#f8fafc" }}>
                       <div style={{ fontWeight: 600, color: "#0f172a" }}>UPI: {data.upiId}</div>
                       {data.upiName && <div style={{ color: "#64748b", marginTop: "1px" }}>{data.upiName}</div>}
-                      <div style={{ color: "#94a3b8", fontSize: "9.5px", marginTop: "2px" }}>Google Pay · PhonePe · Paytm · BHIM</div>
+                      <div style={{ color: "#94a3b8", fontSize: "11px", marginTop: "2px" }}>Google Pay · PhonePe · Paytm · BHIM</div>
                     </div>
                   )}
                   {hasBankTransfer && (
@@ -643,7 +643,7 @@ const InvoicePreview = React.forwardRef<
                       <div style={{ fontWeight: 600, color: "#0f172a", marginBottom: "4px" }}>
                         Bank ({data.paymentModes.filter((m) => ["neft", "rtgs", "imps"].includes(m)).map((m) => m.toUpperCase()).join("/")}):
                       </div>
-                      <table style={{ borderCollapse: "collapse", width: "100%", fontSize: "10px" }}>
+                      <table style={{ borderCollapse: "collapse", width: "100%", fontSize: "11.5px" }}>
                         <tbody>
                           {([
                             ["Account Name", data.accountHolderName],
@@ -680,14 +680,14 @@ const InvoicePreview = React.forwardRef<
             <div>
               <div style={CAP}>Terms &amp; Conditions</div>
               {data.termsAndConditions ? (
-                <div style={{ fontSize: "10px", color: "#64748b", lineHeight: 1.75, whiteSpace: "pre-line" }}>{data.termsAndConditions}</div>
+                <div style={{ fontSize: "11.5px", color: "#64748b", lineHeight: 1.75, whiteSpace: "pre-line" }}>{data.termsAndConditions}</div>
               ) : (
-                <span style={{ color: "#cbd5e1", fontSize: "10.5px" }}>—</span>
+                <span style={{ color: "#cbd5e1", fontSize: "12px" }}>—</span>
               )}
               {data.notes && (
                 <div style={{ marginTop: "8px" }}>
                   <div style={CAP}>Notes</div>
-                  <div style={{ fontSize: "10px", color: "#64748b", lineHeight: 1.6 }}>{data.notes}</div>
+                  <div style={{ fontSize: "11.5px", color: "#64748b", lineHeight: 1.6 }}>{data.notes}</div>
                 </div>
               )}
             </div>
@@ -698,14 +698,14 @@ const InvoicePreview = React.forwardRef<
         <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "14px" }}>
           <div style={{ textAlign: "center", minWidth: "190px" }}>
             <div style={{ height: "44px", borderBottom: "1.5px solid #94a3b8", marginBottom: "7px" }} />
-            <div style={{ fontSize: "9.5px", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "2px" }}>Authorised Signatory</div>
-            <div style={{ fontSize: "11px", fontWeight: 600, color: "#0f172a" }}>{data.sellerName || ""}</div>
+            <div style={{ fontSize: "11px", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "2px" }}>Authorised Signatory</div>
+            <div style={{ fontSize: "12.5px", fontWeight: 600, color: "#0f172a" }}>{data.sellerName || ""}</div>
           </div>
         </div>
 
         {/* ── Footer ── */}
         <div style={{ height: "1px", backgroundColor: "#e2e8f0", marginBottom: "10px" }} />
-        <div style={{ textAlign: "center", fontSize: "9.5px", color: "#94a3b8" }}>
+        <div style={{ textAlign: "center", fontSize: "11px", color: "#94a3b8" }}>
           This is a computer-generated invoice and does not require a physical signature.
           {data.sellerGSTIN && <span> · GSTIN: {data.sellerGSTIN}</span>}
         </div>
