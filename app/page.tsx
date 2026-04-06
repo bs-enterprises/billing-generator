@@ -424,9 +424,9 @@ const InvoicePreview = React.forwardRef<
         {/* ════ HEADER ════ */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "18px" }}>
 
-          {/* Left: company info */}
-          <div style={{ maxWidth: "300px" }}>
-            <div style={{ fontWeight: 700, fontSize: "18.5px", color: "#0f172a", lineHeight: 1.2, marginBottom: "5px" }}>
+          {/* Left: company info card */}
+          <div style={{ border: "1px solid #e2e8f0", borderRadius: "8px", backgroundColor: "#f8fafc", padding: "12px 14px", maxWidth: "300px" }}>
+            <div style={{ fontWeight: 700, fontSize: "18.5px", color: "#0f172a", lineHeight: 1.2, marginBottom: "4px" }}>
               {data.sellerName || "Your Company Name"}
             </div>
             {(data.sellerAddress || data.sellerCity) && (
@@ -435,18 +435,15 @@ const InvoicePreview = React.forwardRef<
               </div>
             )}
             {(data.sellerGSTIN || data.sellerPAN || data.sellerPhone || data.sellerEmail) && (
-              <div style={{ border: "1px solid #e2e8f0", borderRadius: "6px", backgroundColor: "#f8fafc", overflow: "hidden" }}>
+              <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: "7px", display: "flex", flexDirection: "column", gap: "3px" }}>
                 {([
                   data.sellerGSTIN ? ["GSTIN", data.sellerGSTIN, true]  : null,
                   data.sellerPAN   ? ["PAN",   data.sellerPAN,   true]  : null,
                   data.sellerPhone ? ["Phone", data.sellerPhone, false] : null,
                   data.sellerEmail ? ["Email", data.sellerEmail, false] : null,
-                ] as ([string, string, boolean] | null)[]).filter((x): x is [string, string, boolean] => x !== null).map(([label, value, bold], i, arr) => (
-                  <div key={label} style={{
-                    display: "flex", justifyContent: "space-between", alignItems: "center",
-                    padding: "5px 10px", borderBottom: i < arr.length - 1 ? "1px solid #f1f5f9" : "none", fontSize: "11.5px",
-                  }}>
-                    <span style={{ color: "#94a3b8", marginRight: "14px", flexShrink: 0 }}>{label}</span>
+                ] as ([string, string, boolean] | null)[]).filter((x): x is [string, string, boolean] => x !== null).map(([label, value, bold]) => (
+                  <div key={label} style={{ display: "flex", alignItems: "center", fontSize: "11.5px", gap: "8px" }}>
+                    <span style={{ color: "#94a3b8", flexShrink: 0, minWidth: "38px" }}>{label}</span>
                     {bold
                       ? <strong style={{ color: "#0f172a" }}>{value}</strong>
                       : <span style={{ color: "#475569" }}>{value}</span>
@@ -464,7 +461,7 @@ const InvoicePreview = React.forwardRef<
             </div>
             <div style={{
               marginTop: "14px", border: "1px solid #e2e8f0", borderRadius: "6px",
-              overflow: "hidden", minWidth: "210px", backgroundColor: "#f8fafc",
+              overflow: "hidden", minWidth: "210px", backgroundColor: "#f8fafc", paddingBottom: "1rem",
             }}>
               {([
                 ["Invoice No",      data.invoiceNumber || "—"],
@@ -472,7 +469,7 @@ const InvoicePreview = React.forwardRef<
                 ["Due Date",        fmtDate(data.dueDate)],
                 ["Place of Supply", data.placeOfSupply],
               ] as [string, string][]).map(([label, value]) => (
-                <div key={label} style={{ ...ROW, borderBottom: "none" }}>
+                <div key={label} style={{ ...ROW, borderBottom: "none", padding: "4px 12px" }}>
                   <span style={{ color: "#94a3b8" }}>{label}</span>
                   <strong style={{ color: "#0f172a", marginLeft: "20px" }}>{value}</strong>
                 </div>
@@ -484,36 +481,22 @@ const InvoicePreview = React.forwardRef<
         {/* ── divider ── */}
         <div style={{ height: "1px", backgroundColor: "#e2e8f0", marginBottom: "16px" }} />
 
-        {/* ════ BILL FROM / BILL TO ════ */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "18px" }}>
-          {([
-            {
-              label: "Bill From", name: data.sellerName, address: data.sellerAddress,
-              city: data.sellerCity, state: data.sellerState, pincode: data.sellerPincode,
-              gstin: data.sellerGSTIN, pan: data.sellerPAN, phone: data.sellerPhone, email: data.sellerEmail,
-            },
-            {
-              label: "Bill To", name: data.buyerName, address: data.buyerAddress,
-              city: data.buyerCity, state: data.buyerState, pincode: data.buyerPincode,
-              gstin: data.buyerGSTIN, pan: undefined, phone: data.buyerPhone, email: data.buyerEmail,
-            },
-          ]).map((p) => (
-            <div key={p.label} style={{ border: "1px solid #e2e8f0", borderRadius: "6px", padding: "11px 14px", backgroundColor: "#f8fafc" }}>
-              <div style={CAP}>{p.label}</div>
-              <div style={{ fontWeight: 700, fontSize: "14.5px", color: "#0f172a" }}>{p.name || "—"}</div>
-              {p.address && (
-                <div style={{ fontSize: "12px", color: "#64748b", marginTop: "3px", lineHeight: 1.55 }}>
-                  {[p.address, p.city, p.state, p.pincode].filter(Boolean).join(", ")}
-                </div>
-              )}
-              <div style={{ marginTop: "5px", fontSize: "12px", color: "#475569", lineHeight: 1.7 }}>
-                {p.gstin && <div><span style={{ color: "#94a3b8" }}>GSTIN </span><strong>{p.gstin}</strong></div>}
-                {p.pan   && <div><span style={{ color: "#94a3b8" }}>PAN </span><strong>{p.pan}</strong></div>}
-                {p.phone && <div><span style={{ color: "#94a3b8" }}>Phone </span>{p.phone}</div>}
-                {p.email && <div><span style={{ color: "#94a3b8" }}>Email </span>{p.email}</div>}
+        {/* ════ BILL TO ════ */}
+        <div style={{ marginBottom: "18px" }}>
+          <div style={{ border: "1px solid #e2e8f0", borderRadius: "6px", padding: "11px 14px", backgroundColor: "#f8fafc" }}>
+            <div style={CAP}>Bill To</div>
+            <div style={{ fontWeight: 700, fontSize: "14.5px", color: "#0f172a" }}>{data.buyerName || "—"}</div>
+            {data.buyerAddress && (
+              <div style={{ fontSize: "12px", color: "#64748b", marginTop: "3px", lineHeight: 1.55 }}>
+                {[data.buyerAddress, data.buyerCity, data.buyerState, data.buyerPincode].filter(Boolean).join(", ")}
               </div>
+            )}
+            <div style={{ marginTop: "5px", fontSize: "12px", color: "#475569", lineHeight: 1.7 }}>
+              {data.buyerGSTIN && <div><span style={{ color: "#94a3b8" }}>GSTIN </span><strong>{data.buyerGSTIN}</strong></div>}
+              {data.buyerPhone && <div><span style={{ color: "#94a3b8" }}>Phone </span>{data.buyerPhone}</div>}
+              {data.buyerEmail && <div><span style={{ color: "#94a3b8" }}>Email </span>{data.buyerEmail}</div>}
             </div>
-          ))}
+          </div>
         </div>
 
         {/* ════ LINE ITEMS ════ */}
