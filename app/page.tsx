@@ -67,6 +67,7 @@ interface InvoiceData {
   branchName: string;
   // Payment
   paymentModes: string[];
+  upiType: "id" | "number";
   upiId: string;
   upiName: string;
   chequePayableTo: string;
@@ -144,7 +145,7 @@ const PROFILE_KEYS: (keyof InvoiceData)[] = [
   "invoiceNumber", "invoiceDate", "dueDate", "placeOfSupply",
   "items",
   "bankName", "accountHolderName", "accountNumber", "ifscCode", "branchName",
-  "paymentModes", "upiId", "upiName", "chequePayableTo",
+  "paymentModes", "upiType", "upiId", "upiName", "chequePayableTo",
   "paymentStatus", "paymentReference", "amountPaid",
   "notes", "termsAndConditions",
 ];
@@ -214,7 +215,7 @@ const INIT: InvoiceData = {
   items: [{ id: uid(), description: "", hsnSac: "", quantity: 1, unit: "Nos", rate: 0, gstRate: 18 }],
   bankName: "", accountHolderName: "", accountNumber: "", ifscCode: "", branchName: "",
   paymentModes: ["neft", "rtgs"],
-  upiId: "", upiName: "", chequePayableTo: "",
+  upiType: "id", upiId: "", upiName: "", chequePayableTo: "",
   paymentStatus: "unpaid", paymentReference: "", amountPaid: 0,
   notes: "Thank you for your business!",
   termsAndConditions:
@@ -634,7 +635,7 @@ const InvoicePreview = React.forwardRef<
                 <div style={{ border: "1px solid #e2e8f0", borderRadius: "6px", overflow: "hidden", fontSize: "12px" }}>
                   {hasUPI && data.upiId && (
                     <div style={{ padding: "7px 11px", borderBottom: "1px solid #f1f5f9", backgroundColor: "#f8fafc" }}>
-                      <div style={{ fontWeight: 600, color: "#0f172a" }}>UPI: {data.upiId}</div>
+                      <div style={{ fontWeight: 600, color: "#0f172a" }}>{data.upiType === "number" ? "UPI No" : "UPI ID"}: {data.upiId}</div>
                       {data.upiName && <div style={{ color: "#64748b", marginTop: "1px" }}>{data.upiName}</div>}
                       <div style={{ color: "#94a3b8", fontSize: "11px", marginTop: "2px" }}>Google Pay · PhonePe · Paytm · BHIM</div>
                     </div>
@@ -817,7 +818,7 @@ export default function InvoiceGenerator() {
       // to lab(), which jsPDF also rejects. Override every CSS custom property
       // on the cloned document root with plain hex equivalents before capture.
       const canvas = await html2canvas(el, {
-        scale: 2, useCORS: true, logging: false, backgroundColor: "#ffffff",
+        scale: 3, useCORS: true, logging: false, backgroundColor: "#ffffff",
         onclone: (clonedDoc) => {
           // Pin the invoice element to a consistent A4-proportional width so
           // the PDF layout is identical regardless of current browser viewport.
@@ -854,11 +855,11 @@ export default function InvoiceGenerator() {
       const contentW = A4W - margin * 2;
       const imgH = contentW * (canvas.height / canvas.width);
       const pageH = A4H - margin * 2;
-      pdf.addImage(imgData, "PNG", margin, margin, contentW, imgH);
+      pdf.addImage(imgData, "PNG", margin, margin, contentW, imgH, undefined, "NONE");
       let remaining = imgH - pageH, pagePos = pageH;
       while (remaining > 0) {
         pdf.addPage();
-        pdf.addImage(imgData, "PNG", margin, margin - pagePos, contentW, imgH);
+        pdf.addImage(imgData, "PNG", margin, margin - pagePos, contentW, imgH, undefined, "NONE");
         pagePos += pageH;
         remaining -= pageH;
       }
@@ -1208,10 +1209,38 @@ export default function InvoiceGenerator() {
                     <div className="flex items-center gap-2 text-sm font-semibold">
                       <Smartphone className="h-4 w-4 text-primary" /> UPI Details
                     </div>
+                    {/* UPI type toggle */}
+                    <div className="flex items-center gap-4 text-sm">
+                      <label className="flex items-center gap-1.5 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="upiType"
+                          value="id"
+                          checked={data.upiType === "id"}
+                          onChange={() => set("upiType", "id")}
+                          className="accent-primary"
+                        />
+                        <span>UPI ID <span className="text-muted-foreground text-xs">(e.g. name@paytm)</span></span>
+                      </label>
+                      <label className="flex items-center gap-1.5 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="upiType"
+                          value="number"
+                          checked={data.upiType === "number"}
+                          onChange={() => set("upiType", "number")}
+                          className="accent-primary"
+                        />
+                        <span>Mobile Number <span className="text-muted-foreground text-xs">(linked to UPI)</span></span>
+                      </label>
+                    </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <Field label="UPI ID">
-                        <Input placeholder="yourname@paytm" value={data.upiId}
-                          onChange={(e) => set("upiId", e.target.value)} />
+                      <Field label={data.upiType === "number" ? "UPI Mobile Number" : "UPI ID"}>
+                        <Input
+                          placeholder={data.upiType === "number" ? "9876543210" : "yourname@paytm"}
+                          value={data.upiId}
+                          onChange={(e) => set("upiId", e.target.value)}
+                        />
                       </Field>
                       <Field label="Registered Name">
                         <Input placeholder="Name on UPI app" value={data.upiName}
